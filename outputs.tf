@@ -37,3 +37,13 @@ output "route53_nameservers" {
   description = "Update your domain registrar to use these nameservers"
   value       = var.domain_name != "" ? aws_route53_zone.main[0].name_servers : []
 }
+
+output "cloudfront_url" {
+  description = "CloudFront HTTPS URL — use this for Google OAuth redirect URI"
+  value       = "https://${aws_cloudfront_distribution.app.domain_name}"
+}
+
+output "cloudfront_oauth_redirect" {
+  description = "Add this to Google Cloud Console authorized redirect URIs"
+  value       = "https://${aws_cloudfront_distribution.app.domain_name}/auth/callback"
+}

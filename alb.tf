@@ -72,3 +72,55 @@ resource "aws_lb_listener" "https" {
     target_group_arn = aws_lb_target_group.app.arn
   }
 }
+
+# CloudFront distribution — provides HTTPS without a custom domain
+# Use this for testing before a real domain is set up
+resource "aws_cloudfront_distribution" "app" {
+  enabled             = true
+  default_root_object = ""
+  comment             = "${var.app_name} CDN"
+  price_class         = "PriceClass_100"  # US/EU only, cheapest
+
+  origin {
+    domain_name = aws_lb.main.dns_name
+    origin_id   = "alb-origin"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  default_cache_behavior {
+    target_origin_id       = "alb-origin"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD"]
+
+    forwarded_values {
+      query_string = true
+      headers      = ["*"]   # forward all headers (needed for cookies/auth)
+      cookies {
+        forward = "all"       # forward all cookies (session cookie)
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 0           # no caching — app is dynamic
+    max_ttl     = 0
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true  # free *.cloudfront.net cert
+  }
+
+  tags = { Name = "${var.app_name}-cdn" }
+}
