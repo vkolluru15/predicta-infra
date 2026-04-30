@@ -1,0 +1,15 @@
+aws_region    = "us-east-1"
+app_name      = "predicta"
+domain_name   = "mypredicta.com"   # leave "" to skip ACM + Route53
+
+db_password   = "change-me-strong-password"
+
+ec2_instance_type = "t3.micro"
+ec2_key_name      = "predicta-key"
+
+google_client_id     = "xxxx.apps.googleusercontent.com"
+google_client_secret = "xxxx"
+cricapi_key          = "6e811c33-2ade-4e73-b05c-90a8ccd64e09"
+worker_trigger_key   = "generate-with-openssl-rand-hex-32"
+vapid_public_key     = ""
+vapid_private_key    = ""
